@@ -203,27 +203,41 @@ namespace CsharpBasics
             }
 
             public double RequestCommand(double currentPercentage, double targetPercentage){
-
+                // Opening
                 if(targetPercentage > currentPercentage)
                 {
+                    
                     // I/P Module Calculation
-                    for (double i = OutputPressure; i < OPENING_PRESSURE; i+=5)
+                    while(this.OutputPressure < OPENING_PRESSURE)
                     {
                         System.Console.WriteLine("氣動閥開啟中");
+                        this.OutputPressure+=5;
                     }
+                    System.Console.WriteLine($"輸出壓力{this.OutputPressure} psi");
+                    return targetPercentage;
         
                 }
-                
-                if(currentPercentage < targetPercentage)
+
+                //Closing
+                if(targetPercentage < currentPercentage)
                 {
                     // I/P Module Calculation
+                    // while(this.OutputPressure > CLOSING_PRESSURE)
+                    // {
+                    //     System.Console.WriteLine("氣動閥關閉中");
+                    //     this.OutputPressure -= 5;
+                    // }
                     for (double i = OutputPressure; i > CLOSING_PRESSURE; i-=5)
                     {
                         System.Console.WriteLine("氣動閥關閉中");
+                        this.OutputPressure -= 5;   
                     }
+                    System.Console.WriteLine($"輸出壓力{this.OutputPressure} psi");
+                    return targetPercentage;
                 }
 
-                return targetPercentage;
+                System.Console.WriteLine($"開度{currentPercentage}%無變化");
+                return currentPercentage;
             }
 
             public bool IsPositionerNormal()
@@ -272,7 +286,7 @@ namespace CsharpBasics
                 return ;
             else
             {
-                System.Console.WriteLine($"{this.ValveName}-目前開度{this.CurrentPositionPercentage}%");
+                System.Console.WriteLine($"{this.ValveName}-目前開度{this.CurrentPositionPercentage}%，指定全開");
                 
                 this.CurrentPositionPercentage = this.positioner.RequestCommand(this.CurrentPositionPercentage, 100);
                 if(this.IsOpened()){
@@ -297,7 +311,7 @@ namespace CsharpBasics
                 return ;
             else
             {
-                System.Console.WriteLine($"{this.ValveName}-目前開度{this.CurrentPositionPercentage}%");
+                System.Console.WriteLine($"{this.ValveName}-目前開度{this.CurrentPositionPercentage}%，指定全關");
                 
                 this.CurrentPositionPercentage = this.positioner.RequestCommand(this.CurrentPositionPercentage, 0);
                 if(this.IsClosed()){
@@ -306,6 +320,18 @@ namespace CsharpBasics
             }
 
 
+        }
+
+        public void RequestPosition(double requestedPosition)
+        {
+            if(!this.positioner.IsPositionerNormal())
+                return;
+            else
+            {
+                System.Console.WriteLine($"{this.ValveName}-目前開度{this.CurrentPositionPercentage}%，指定開度{requestedPosition}%");
+                this.CurrentPositionPercentage = this.positioner.RequestCommand(this.CurrentPositionPercentage, requestedPosition);
+                System.Console.WriteLine($"已達指定開度{this.CurrentPositionPercentage}%");
+            }
         }
 
         public bool IsCalibrated { get; protected set; } = false;
@@ -358,13 +384,16 @@ namespace CsharpBasics
             StAOV1.PositionerCalibrate();
             StAOV1.Open();
             StAOV1.Close();
+            StAOV1.RequestPosition(32);
 
             var StAOV2 = new AirOperatedValve();
             System.Console.WriteLine(StAOV2);
             StAOV2.PositionerCalibrate();
+            StAOV2.RequestPosition(78);
+
             StAOV2.Open();
             StAOV2.Close();
-
+            
         }
     }
 }
