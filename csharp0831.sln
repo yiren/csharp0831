@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoqTestsWithNUnit", "MoqTes
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PrimeService.xUnit", "PrimeService.xUnit\PrimeService.xUnit.csproj", "{2DCA43B6-1200-4116-87C1-DAC723C43FC4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CsharpBasics", "CsharpBasics\CsharpBasics.csproj", "{88C50BC1-3E55-472E-A2B4-0F3BE318104E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -72,5 +74,17 @@ Global
 		{2DCA43B6-1200-4116-87C1-DAC723C43FC4}.Release|x64.Build.0 = Release|Any CPU
 		{2DCA43B6-1200-4116-87C1-DAC723C43FC4}.Release|x86.ActiveCfg = Release|Any CPU
 		{2DCA43B6-1200-4116-87C1-DAC723C43FC4}.Release|x86.Build.0 = Release|Any CPU
+		{88C50BC1-3E55-472E-A2B4-0F3BE318104E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{88C50BC1-3E55-472E-A2B4-0F3BE318104E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{88C50BC1-3E55-472E-A2B4-0F3BE318104E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{88C50BC1-3E55-472E-A2B4-0F3BE318104E}.Debug|x64.Build.0 = Debug|Any CPU
+		{88C50BC1-3E55-472E-A2B4-0F3BE318104E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{88C50BC1-3E55-472E-A2B4-0F3BE318104E}.Debug|x86.Build.0 = Debug|Any CPU
+		{88C50BC1-3E55-472E-A2B4-0F3BE318104E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{88C50BC1-3E55-472E-A2B4-0F3BE318104E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{88C50BC1-3E55-472E-A2B4-0F3BE318104E}.Release|x64.ActiveCfg = Release|Any CPU
+		{88C50BC1-3E55-472E-A2B4-0F3BE318104E}.Release|x64.Build.0 = Release|Any CPU
+		{88C50BC1-3E55-472E-A2B4-0F3BE318104E}.Release|x86.ActiveCfg = Release|Any CPU
+		{88C50BC1-3E55-472E-A2B4-0F3BE318104E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
