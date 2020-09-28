@@ -2,19 +2,7 @@
 using System.Threading;
 namespace CsharpBasics
 {
-    enum ValveSeatType
-    {
-        Ball,
-        ButterFly,
-        Gate
-    }
-
-    enum ValvePowerSource
-    {
-        Manual,
-        Air,
-        Motor
-    }
+   
 
 
     interface IValve
@@ -29,11 +17,33 @@ namespace CsharpBasics
         void Close();
     }
 
+
+     enum ValveSeatType
+    {
+        Ball,
+        ButterFly,
+        Gate
+    }
+
+    enum ValvePowerSource
+    {
+        Manual,
+        Air,
+        Motor
+    }
+
+    enum ValveStatus
+    {
+        Opened,
+        Closed,
+        OpenClosing
+    }
+    //母類別
     class GenericValve
     {   
         // 0 = Fail as it is, 1= Fail to open, 2= fail to closed
         
-
+        // 除了自己跟子類別以外，都看不到
         protected GenericValve(double diameter)
         {
             this._diameter = diameter;
@@ -42,7 +52,7 @@ namespace CsharpBasics
         public GenericValve(string valveName, double diameter, ValvePowerSource powerSource)
         {   
             this.ValveName = valveName;
-            this._seatType = ValveSeatType.Ball;
+            this._seatType = ValveSeatType.Ball;// "Ball" "Butterfly"
             this._diameter=diameter;
             this._powerSource = powerSource;
         }
@@ -60,40 +70,50 @@ namespace CsharpBasics
             this._powerSource = powerSource;
             this._seatType = seatType;
             this._diameter=diameter;
+           
         }
+        
+        // 屬性(Property)
         public string ValveName { get; protected set; }
-        public int SerialID { get; set; }
+        
+        public ValveStatus Status { get; protected set; }
+
         public ValvePowerSource _powerSource {get; protected set;}
         public ValveSeatType _seatType {get; protected set;}
-        public readonly double _diameter;
-        public bool Closed { get; protected set;}
-        public bool Opened { get; protected set;}
-
+        
+        //public string _ValveSeatType { get;protected set; }
+        public readonly double _diameter; // 閥的size
+        public bool FullClosed { get; protected set;}
+        public bool FullOpened { get; protected set;}
+        public int SerialID { get; set; }
         public bool IsOpenClosing { get; protected set; }
 
         public bool OpenLimitSwitchEnabled { get; protected set; }
 
         public bool CloseLimitSwitchEnabled { get; protected set; }
+        
+       
+        // 方法(Method)-動作
         public virtual void Open()
         {
-            if(this.Opened){
-                System.Console.WriteLine($"{this.ValveName}已開");
+            if(this.FullOpened){
+                System.Console.WriteLine($"{this.ValveName}已全開");
                 return;
             }
             System.Console.WriteLine($"{this.ValveName}打開中");
 
             this.IsOpenClosing = true;
-            this.Opened = false;
+            this.FullOpened = false;
             if(this.IsOpened())
             {
-                this.Opened = true;
+                this.FullOpened = true;
                 this.IsOpenClosing= false;
-                System.Console.WriteLine($"{this.ValveName}已開");
+                System.Console.WriteLine($"{this.ValveName}已全開");
             }
         }
         public virtual void Close()
         {
-            if(this.Closed){
+            if(this.FullClosed){
                 System.Console.WriteLine($"{this.ValveName}已關");
                 return;
             }
@@ -101,10 +121,10 @@ namespace CsharpBasics
             System.Console.WriteLine($"{this.ValveName}關閉中");
             
             this.IsOpenClosing = true;
-            this.Closed = false;
+            this.FullClosed = false;
             if(this.IsClosed())
             {
-                this.Closed=true;
+                this.FullClosed=true;
                 this.IsOpenClosing= false;
                 System.Console.WriteLine($"{this.ValveName}已關");
             }
@@ -113,11 +133,19 @@ namespace CsharpBasics
 
         public virtual bool IsOpened()
         {
-            
-            System.Console.WriteLine($"{this.ValveName}已碰到Open Limit Switch");
             this.OpenLimitSwitchEnabled = true;
-            // tenery operator 
-            return this.OpenLimitSwitchEnabled ? true : false;
+            System.Console.WriteLine($"{this.ValveName}已碰到Open Limit Switch");
+            if(this.OpenLimitSwitchEnabled)
+            {
+                return true;
+            }else{
+                return false;
+            }
+            
+            
+            // tenery operator (三元運算子)
+            //return this.OpenLimitSwitchEnabled ? true : false;
+            
         }
 
         public virtual bool IsClosed()
@@ -131,45 +159,50 @@ namespace CsharpBasics
 
         public void ChangeName(string newName)
         {
+           
             this.ValveName = newName;
             System.Console.WriteLine($"閥名稱已改為{this.ValveName}");
         }
-
+        // 覆寫母類別的方法定義
         public override string ToString()
         {
             return $"{this.ValveName} 是 {this._seatType} 型式，大小是{this._diameter}，是用{this._powerSource}驅動。";
         }
-
+        
     }
-
+    //子類別
     class ManualValve: GenericValve
     {
-        
-        public ManualValve(string valveName, double diameter, ValveSeatType seatType):base(valveName, diameter, seatType)
-        {
     
+        public int SerialNumber { get; protected set; } =0;
+        public ManualValve(string valveName, double diameter, ValveSeatType seatType)
+                            :base(valveName, diameter, seatType)
+                            // public GenericValve(x, y, z)
+        {
+            this.SerialNumber++;  
         }
         
     }
-
     enum PositionerOpenMode{
         Linear,
         Equal,
         QuickOpen
     }
+   
     
     class AirOperatedValve: GenericValve
     {
         
-        private class Positioner
+        
+        class SuperPositioner
         {
-            public const double MIN_PRESSURE = 10;
-            public const double MAX_PRESSURE = 90;
+            public const double MIN_PRESSURE = 5;
+            public const double MAX_PRESSURE = 60;
             public const double CLOSING_PRESSURE = 20;
             public const double OPENING_PRESSURE = 50;
             public bool IsReverse { get; private set; } = false;
             public bool IsManual { get; private set; } = false;
-            public Positioner()
+            public SuperPositioner()
             {
                 this.InitializePositioner();
             }
@@ -210,7 +243,7 @@ namespace CsharpBasics
                     // I/P Module Calculation
                     while(this.OutputPressure < OPENING_PRESSURE)
                     {
-                        System.Console.WriteLine("氣動閥開啟中");
+                        // System.Console.WriteLine("氣動閥開啟中");
                         this.OutputPressure+=5;
                     }
                     System.Console.WriteLine($"輸出壓力{this.OutputPressure} psi");
@@ -229,7 +262,7 @@ namespace CsharpBasics
                     // }
                     for (double i = OutputPressure; i > CLOSING_PRESSURE; i-=5)
                     {
-                        System.Console.WriteLine("氣動閥關閉中");
+                        // System.Console.WriteLine("氣動閥關閉中");
                         this.OutputPressure -= 5;   
                     }
                     System.Console.WriteLine($"輸出壓力{this.OutputPressure} psi");
@@ -242,12 +275,12 @@ namespace CsharpBasics
 
             public bool IsPositionerNormal()
             {
-                if(this.AirSupplyPressure < 10 || this.OutputPressure <10)
+                if(this.AirSupplyPressure < MIN_PRESSURE || this.OutputPressure < MIN_PRESSURE)
                 {
                     System.Console.WriteLine("壓力不足，無法作動");
                     return false;
                 }
-                if(this.AirSupplyPressure > 90 || this.OutputPressure >90)
+                if(this.AirSupplyPressure > MAX_PRESSURE || this.OutputPressure > MAX_PRESSURE)
                 {
                     System.Console.WriteLine("壓力過高，無法作動");
                     return false;
@@ -257,12 +290,15 @@ namespace CsharpBasics
 
         }
 
-        private Positioner positioner;
+    
+        private SuperPositioner positioner;
 
         private Random random = new Random();
         public double CurrentPositionPercentage { get; protected set; } 
 
-        public static int StandardSerialNumber = 0;
+        private static int StandardSerialNumber = 0;
+
+        public static int GetSerialNumber() => StandardSerialNumber;
         public AirOperatedValve():base(6)
         {
             StandardSerialNumber++;
@@ -270,14 +306,14 @@ namespace CsharpBasics
             this._powerSource = ValvePowerSource.Air;
             this._seatType= ValveSeatType.Ball;
             this.CurrentPositionPercentage = random.Next(30, 50);
-            this.positioner= new Positioner();
+            this.positioner= new SuperPositioner();
             
         }
         public AirOperatedValve(string valveName, double diameter):base(valveName, diameter, ValvePowerSource.Air)
         {
             
             this.CurrentPositionPercentage = random.Next(30, 50);
-            this.positioner= new Positioner();
+            this.positioner= new SuperPositioner();
         }
 
         public override void Open()
@@ -356,30 +392,48 @@ namespace CsharpBasics
     {
         static void Main(string[] args)
         {
-            var manualValve =  new GenericValve("手動閥-1", 3.5, ValvePowerSource.Manual, ValveSeatType.Ball);
-            System.Console.WriteLine(manualValve);
-            manualValve.Open();
-            manualValve.Close();
+
+            
+            // var manualValve =  new GenericValve("手動閥-1", 3.5, ValvePowerSource.Manual, ValveSeatType.Ball);
+            // //var manualValve = new GenericValve();
+            // System.Console.WriteLine(manualValve);
+            // manualValve.Open();
+            // manualValve.Close();
+            // manualValve.ChangeName("newName");
+            // manualValve.SerialID = 1235;
+           
+
+            // var airValve =  new GenericValve("氣動閥-1", 9, ValvePowerSource.Air, ValveSeatType.ButterFly);
+            // System.Console.WriteLine(airValve);
+            // airValve.Open();
+            // airValve.Close();
 
 
-            var airValve =  new GenericValve("氣動閥-1", 9, ValvePowerSource.Air, ValveSeatType.ButterFly);
-            System.Console.WriteLine(airValve);
-            airValve.Open();
-            airValve.Close();
+            // var MV1 =  new ManualValve("特製手動閥", 5.5, ValveSeatType.ButterFly);
+            // System.Console.WriteLine(MV1);
+            // MV1.Open();
+            // MV1.Close();
+            // MV1.ChangeName($"手動閥{MV1.SerialNumber}號");
 
 
-            var MV1 =  new ManualValve("手動閥-2", 3.5, ValveSeatType.Ball);
-            System.Console.WriteLine(MV1);
-            MV1.Open();
-            MV1.Close();
+            // var MV2 =  new ManualValve("特製手動閥", 5.5, ValveSeatType.ButterFly);
+            // System.Console.WriteLine(MV1);
+            // MV2.Open();
+            // MV2.Close();
+            // MV2.ChangeName($"手動閥{MV1.SerialNumber}號");
+    
 
-            var AOV1 = new AirOperatedValve("氣動閥-2", 6);
-            System.Console.WriteLine(AOV1);
-            AOV1.PositionerCalibrate();
-            AOV1.Open();
-            AOV1.Close();
+            // var AOV1 = new AirOperatedValve("氣動閥2", 6);
+            // System.Console.WriteLine(AOV1);
+            // AOV1.PositionerCalibrate();
+            // AOV1.Open();
+            // AOV1.Close();
 
-            var StAOV1 = new AirOperatedValve();
+
+            // class像是設計圖
+            // new class => 實體物件
+
+            var StAOV1 = new AirOperatedValve(); 
             System.Console.WriteLine(StAOV1);
             StAOV1.PositionerCalibrate();
             StAOV1.Open();
@@ -393,6 +447,19 @@ namespace CsharpBasics
 
             StAOV2.Open();
             StAOV2.Close();
+
+            var StAOV3 = new AirOperatedValve();
+            System.Console.WriteLine(StAOV2);
+            StAOV2.PositionerCalibrate();
+            StAOV2.RequestPosition(78);
+
+            StAOV2.Open();
+            StAOV2.Close();
+
+            
+            int TotalNumber = AirOperatedValve.GetSerialNumber();
+            System.Console.WriteLine($"已經做出{TotalNumber}個標準氣動閥");  
+            
             
         }
     }
