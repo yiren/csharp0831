@@ -1,25 +1,7 @@
+using CsharpBasics.Valve.TypeEnum;
 namespace CsharpBasics.Valve
 {
-    public enum ValveSeatType
-    {
-        Ball,
-        ButterFly,
-        Gate
-    }
-
-    public enum ValvePowerSource
-    {
-        Manual,
-        Air,
-        Motor
-    }
-
-    public enum ValveStatus
-    {
-        Opened,
-        Closed,
-        OpenClosing
-    }
+    
     public class GenericValve
     {   
         // 0 = Fail as it is, 1= Fail to open, 2= fail to closed

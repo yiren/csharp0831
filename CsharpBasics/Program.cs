@@ -1,4 +1,5 @@
 ﻿using CsharpBasics.Valve;
+using CsharpBasics.Valve.TypeEnum;
 namespace CsharpBasics
 {
     class Program
