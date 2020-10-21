@@ -1,3 +1,4 @@
+using CsharpBasics.Valve.TypeEnum;
 namespace CsharpBasics.Valve
 {
     public interface IValve
