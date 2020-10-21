@@ -1,16 +1,67 @@
 ﻿using CsharpBasics.Valve;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace CsharpBasics
 {
+    class MyEnumerable : IEnumerable<int>
+    {
+        private readonly int[] arr;
+
+        public MyEnumerable(int[] arr)
+        {
+            this.arr = arr;
+        }
+        public IEnumerator<int> GetEnumerator()
+        {
+            return new MyEnumerator(arr);
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return this.GetEnumerator();
+        }
+    }
+
+    class MyEnumerator : IEnumerator<int>
+    {
+        private readonly int[] arr;
+
+        private int arrIndex=-1;
+        public MyEnumerator(int[] arr)
+        {
+            this.arr = arr;
+        }
+        public int Current => arr[arrIndex];
+
+        object IEnumerator.Current => Current;
+
+        public void Dispose()
+        {
+            
+        }
+
+        public bool MoveNext()
+        {
+            arrIndex++;
+
+            return arrIndex < arr.Length;
+        }
+
+        public void Reset()
+        {
+            arrIndex=0;
+        }
+    }
     class Program
     {
         
          // Delegate
          // 是特殊物件，基本精神把方法當參數使用(e.g. 傳遞)
 
+        
         delegate double TempTransformation(int n);
 
         static double Temp_F_Cal(int x) => (x*9/5)+32;
@@ -60,11 +111,30 @@ namespace CsharpBasics
             /// bool MoveNext()
             /// var Current {get;}
 
-            var words = "Hello!World";
-            var enumerator = words.GetEnumerator();
+            
+            int[] numbers = {10,20,30};
+
+            var infinite = new MyEnumerable(numbers);
+            foreach(var i in infinite)
+            {
+                System.Console.WriteLine($"Manual Enumeration: {i}");
+            }
+
+            foreach (var i in numbers)
+            {
+                System.Console.WriteLine($"Array Built-in Enumeration: {i}");
+            }
+
+            string words = "Hello!World";
+            CharEnumerator enumerator = words.GetEnumerator();
             while(enumerator.MoveNext()){
                 System.Console.WriteLine(enumerator.Current);
             }
+
+
+            // Collection (Data Structure)
+            // IList, List<T>, Dictionary....
+
 
             // var manualValve =  new GenericValve("手動閥-1", 3.5, ValvePowerSource.Manual, ValveSeatType.Ball);
             // //var manualValve = new GenericValve();
